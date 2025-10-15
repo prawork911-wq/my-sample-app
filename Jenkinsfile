@@ -1,7 +1,6 @@
 pipeline {
     agent any
-
-    tools {
+        tools {
         maven 'Maven-3.9'
         jdk 'jdk17'
     }
@@ -14,8 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/youruser/sample-nexus-project.git'
-            }
+                git branch: 'main', url: 'https://github.com/prawork911-wq/my-sample-app.git'
         }
 
         stage('Code Quality - SonarQube') {
