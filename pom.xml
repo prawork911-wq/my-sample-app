@@ -31,7 +31,7 @@
             <url>http://192.168.1.200:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
+    
     <!-- Build plugins -->
     <build>
         <plugins>

@@ -34,11 +34,11 @@ pipeline {
 
         stage('Deploy to Nexus') {
             steps {
-                sh """
-                  mvn deploy -DskipTests \
-                    -Dnexus.username=${NEXUS_CREDENTIALS_USR} \
-                    -Dnexus.password=${NEXUS_CREDENTIALS_PSW}
-                """
+        // Use settings.xml to provide credentials securely
+                sh 'mvn deploy -DskipTests -s settings.xml'
+           }
+        }
+
             }
         }
     } // closes stages
