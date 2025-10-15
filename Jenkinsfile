@@ -47,4 +47,5 @@ pipeline {
             echo '❌ Build Failed'
         }
     }
+    }
 } // closes pipeline
