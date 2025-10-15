@@ -39,10 +39,6 @@ pipeline {
            }
         }
 
-            }
-        }
-    } // closes stages
-
     post {
         success {
             echo '✅ Build & Deploy Successful'
