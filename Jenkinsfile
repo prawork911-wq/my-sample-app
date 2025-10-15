@@ -1,8 +1,9 @@
 pipeline {
     agent any
-        tools {
-        maven 'Maven-3.9'
-        jdk 'jdk17'
+
+    tools {
+        maven 'Maven'
+        jdk 'JDK17'
     }
 
     environment {
@@ -14,9 +15,10 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/prawork911-wq/my-sample-app.git'
+            }
         }
 
-        stage('Code Quality - SonarQube') {
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh 'mvn clean verify sonar:sonar'
@@ -33,21 +35,20 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 sh """
-                  mvn deploy \
-                  -DskipTests \
-                  -Dnexus.username=${NEXUS_CREDENTIALS_USR} \
-                  -Dnexus.password=${NEXUS_CREDENTIALS_PSW}
+                  mvn deploy -DskipTests \
+                    -Dnexus.username=${NEXUS_CREDENTIALS_USR} \
+                    -Dnexus.password=${NEXUS_CREDENTIALS_PSW}
                 """
             }
         }
-    }
+    } // closes stages
 
     post {
         success {
-            echo "✅ Build and Deployment to Nexus Successful!"
+            echo '✅ Build & Deploy Successful'
         }
         failure {
-            echo "❌ Build Failed. Check Console Output."
+            echo '❌ Build Failed'
         }
     }
-}
+} // closes pipeline
