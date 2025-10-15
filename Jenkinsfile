@@ -1,14 +1,13 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-        jdk 'JDK17'
-    }
-
     environment {
-        NEXUS_CREDENTIALS = credentials('nexus-credentials')
-        SONARQUBE_ENV = 'sonarqube'
+        // SonarQube server installation name in Jenkins
+        SONARQUBE = 'sonarqube'
+        // Nexus credentials ID stored in Jenkins
+        NEXUS_CREDENTIALS = 'nexus-creds'
+        // Maven settings.xml location if using Jenkins Managed File
+        MAVEN_SETTINGS = 'settings.xml'
     }
 
     stages {
@@ -20,32 +19,45 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh 'mvn clean verify sonar:sonar'
+                withSonarQubeEnv("${SONARQUBE}") {
+                    sh 'mvn clean verify sonar:sonar -DskipTests'
                 }
             }
         }
 
         stage('Build & Package') {
             steps {
-                sh 'mvn clean package -DskipTests=true'
+                sh 'mvn clean install -DskipTests'
             }
         }
 
         stage('Deploy to Nexus') {
             steps {
-        // Use settings.xml to provide credentials securely
-                sh 'mvn deploy -DskipTests -s settings.xml'
-           }
+                withCredentials([usernamePassword(
+                    credentialsId: "${NEXUS_CREDENTIALS}",
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASSWORD'
+                )]) {
+                    sh '''
+                        mvn deploy -s ${MAVEN_SETTINGS} \
+                        -Dnexus.username=$NEXUS_USER \
+                        -Dnexus.password=$NEXUS_PASSWORD \
+                        -DskipTests
+                    '''
+                }
+            }
         }
+    }
 
     post {
         success {
-            echo '✅ Build & Deploy Successful'
+            echo '✅ Build, SonarQube, and Nexus deploy succeeded!'
         }
         failure {
-            echo '❌ Build Failed'
+            echo '❌ Build or deploy failed!'
+        }
+        always {
+            cleanWs()
         }
     }
-    }
-} // closes pipeline
+}
