@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // SonarQube server installation name in Jenkins
-        SONARQUBE = 'sonarqube'
+        // SonarQube server installation name in Jenkins (match configured Name, case-sensitive)
+        SONARQUBE = 'SONARQUBE'
         // Nexus credentials ID stored in Jenkins
         NEXUS_CREDENTIALS = 'nexus-creds'
         // Maven settings.xml location if using Jenkins Managed File
